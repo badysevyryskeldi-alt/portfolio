@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Солнечная система на карте Бишкека</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{--bg:#f4f1ea;--fg:#1d2330;--card:#fff;--mut:#667;--bd:#d9d4c7}
+@media (prefers-color-scheme:dark){:root{--bg:#14171d;--fg:#eceff4;--card:#1e232c;--mut:#9aa3b2;--bd:#323946}}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
+header{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+h1{font-size:17px;margin:0}header span{font-size:12px;color:var(--mut)}
+main{flex:1;display:flex;min-height:0}
+#map{flex:1;min-width:0}
+#panel{width:320px;border-left:1px solid var(--bd);overflow:auto;padding:14px;background:var(--card)}
+#panel h2{margin:0 0 4px;font-size:20px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+td{padding:4px 0;border-bottom:1px solid var(--bd);vertical-align:top}td:first-child{color:var(--mut);padding-right:8px}
+ul{padding-left:18px;font-size:13.5px;line-height:1.45}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.chips button{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:8px;font-size:12px;padding:4px 8px;cursor:pointer}
+.note{font-size:11.5px;color:var(--mut);margin-top:10px}
+.pl{display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);pointer-events:auto}
+.pl i{display:block;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #0007}
+.pl b{font-size:12px;color:#111;background:#fffc;padding:0 4px;border-radius:4px;white-space:nowrap;margin-top:2px}
+.tb{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px}#sp{vertical-align:middle;width:110px}@media(max-width:760px){main{flex-direction:column}#panel{width:auto;max-height:42%;border-left:0;border-top:1px solid var(--bd)}}
+</style>
+</head>
+<body>
+<header><h1>☀️ Солнечная система на карте Бишкека</h1><button id="pp" class="tb">⏸ Пауза</button> <label class="tg">1 земной год = <b id="spv"></b> <input type="range" id="sp" min="0" max="100" value="38"></label> <label class="tg"><input type="checkbox" id="fol"> следить за выбранной</label> <span class="tg" id="yr"></span> <span>Центр: 42°49′45.7″N 74°37′50.0″E · Солнце Ø 3 м · масштаб 1 : 464 000 000</span></header>
+<main><div id="map"></div><aside id="panel"></aside></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const LAT=42+49/60+45.7/3600, LON=74+37/60+50/3600; // 42.82936, 74.63056
+const K=3/1392700; // м модели на 1 км
+const P=[
+{n:'Солнце',d:1392700,a:0,c:'#fdb813',st:[['Тип','Жёлтый карлик (G2V)'],['Масса','1,989·10³⁰ кг'],['Температура','5 500 °C (поверхность), 15 млн °C (ядро)'],['Возраст','≈4,6 млрд лет']],f:['Содержит 99,86% массы всей Солнечной системы.','Свет от Солнца идёт до Земли около 8 минут 20 секунд.','Внутри поместилось бы около 1,3 млн Земель.']},
+{n:'Меркурий',d:4879,a:57.9e6,c:'#9b9b9b',st:[['Расстояние до Солнца','57,9 млн км'],['Год','88 земных суток'],['Сутки','58,6 земных суток'],['Температура','−180…+430 °C'],['Спутники','0']],f:['Самая маленькая и самая быстрая планета.','Почти нет атмосферы, поверхность в кратерах, как у Луны.','Один солнечный день на Меркурии длится 176 земных суток.']},
+{n:'Венера',d:12104,a:108.2e6,c:'#e6c27a',st:[['Расстояние до Солнца','108,2 млн км'],['Год','225 земных суток'],['Сутки','243 земных суток'],['Температура','≈465 °C'],['Спутники','0']],f:['Самая горячая планета, горячее Меркурия.','Давление у поверхности в ~92 раза больше земного.','Вращается в обратную сторону — Солнце встаёт на западе.']},
+{n:'Земля',d:12742,a:149.6e6,c:'#3d8bd9',st:[['Расстояние до Солнца','149,6 млн км'],['Год','365,25 суток'],['Сутки','23 ч 56 мин'],['Температура','средняя +15 °C'],['Спутники','1 (Луна)']],f:['Единственная известная планета с жизнью.','71% поверхности покрыто водой.','На этой карте целая Земля — шарик размером с горошину (2,7 см).']},
+{n:'Марс',d:6779,a:227.9e6,c:'#c1440e',st:[['Расстояние до Солнца','227,9 млн км'],['Год','687 земных суток'],['Сутки','24 ч 37 мин'],['Температура','−125…+20 °C'],['Спутники','2 (Фобос, Деймос)']],f:['«Красная планета» из-за оксида железа в грунте.','Гора Олимп (≈22 км) — самый высокий вулкан в системе.','Атмосфера на 95% состоит из углекислого газа.']},
+{n:'Юпитер',d:139820,a:778.5e6,c:'#d9a066',st:[['Расстояние до Солнца','778,5 млн км'],['Год','11,86 земных лет'],['Сутки','9 ч 56 мин'],['Температура','≈−110 °C (верх облаков)'],['Спутники','95+']],f:['Самая большая планета: внутри поместилось бы 1 300 Земель.','Большое Красное Пятно — шторм, бушующий сотни лет.','Тяжелее всех остальных планет вместе взятых в 2,5 раза.']},
+{n:'Сатурн',d:116460,a:1432e6,c:'#e3cf8e',st:[['Расстояние до Солнца','1 432 млн км'],['Год','29,5 земных лет'],['Сутки','10 ч 33 мин'],['Температура','≈−140 °C'],['Спутники','140+']],f:['Знаменитые кольца состоят из льда и камня.','Средняя плотность меньше плотности воды.','Спутник Титан имеет плотную атмосферу и метановые озёра.']},
+{n:'Уран',d:50724,a:2867e6,c:'#8fd8e0',st:[['Расстояние до Солнца','2 867 млн км'],['Год','84 земных года'],['Сутки','17 ч 14 мин'],['Температура','≈−195 °C'],['Спутники','28']],f:['Вращается «лёжа на боку»: наклон оси 98°.','Открыт в 1781 году Уильямом Гершелем.','Ледяной гигант: вода, аммиак и метан.']},
+{n:'Нептун',d:49244,a:4515e6,c:'#3b5de0',st:[['Расстояние до Солнца','4 515 млн км'],['Год','164,8 земных лет'],['Сутки','16 ч 6 мин'],['Температура','≈−200 °C'],['Спутники','16']],f:['Самые быстрые ветры — до 2 000 км/ч.','Предсказан математически до наблюдения (1846).','Крупнейший спутник Тритон вращается в обратную сторону.']}
+];
+const fmt=m=>m>=1000?(m/1000).toLocaleString('ru',{maximumFractionDigits:2})+' км':m>=1?m.toLocaleString('ru',{maximumFractionDigits:1})+' м':m>=0.01?(m*100).toLocaleString('ru',{maximumFractionDigits:1})+' см':(m*1000).toLocaleString('ru',{maximumFractionDigits:1})+' мм';
+let selI=0;
+const MAPR=()=>typeof map!=='undefined'&&map&&P[8].m;
+function setPos(i,lat,lng){const q=[lat,lng];P[i].c1.setLatLng(q);P[i].m.setLatLng(q);P[i].ll=q;}
+function follow(i){map.panTo(P[i].ll,{animate:false});}
+const mLon=m=>m/(111320*Math.cos(LAT*Math.PI/180)); // метры -> градусы долготы
+
+const map=L.map('map',{maxZoom:22}).setView([LAT,LON],13);
+const baseCarto=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:22,maxNativeZoom:19,attribution:'© OpenStreetMap contributors © CARTO'}).addTo(map);
+const baseSat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22,maxNativeZoom:19,attribution:'Tiles © Esri'});
+const BASES={'Карта (CARTO)':baseCarto,'Спутник (Esri)':baseSat};
+L.control.scale({metric:true,imperial:false}).addTo(map);
+const orbits=L.layerGroup().addTo(map), bodies=L.layerGroup().addTo(map);
+
+P.forEach((p,i)=>{
+  p.dm=p.a*K;                 // расстояние в метрах модели
+  p.ll=[LAT,LON+mLon(p.dm)];  // планеты стоят на линии к востоку от Солнца
+  if(i) L.circle([LAT,LON],{radius:p.dm,color:'#555',weight:1,dashArray:'6 6',fill:false,interactive:false}).addTo(orbits);
+  // реальный размер (в метрах модели)
+  p.c1=L.circle(p.ll,{radius:p.d*K/2,color:p.c,weight:1,fillColor:p.c,fillOpacity:1,interactive:false}).addTo(bodies);
+  // заметная точка, чтобы планету было видно при любом масштабе
+  const s=i?12:18;
+  const ic=L.divIcon({className:'',iconSize:[0,0],html:'<div class="pl"><i style="width:'+s+'px;height:'+s+'px;background:'+p.c+'"></i><b>'+p.n+'</b></div>'});
+  p.m=L.marker(p.ll,{icon:ic,zIndexOffset:i?0:500}).on('click',()=>panel(i,true)).addTo(bodies);
+});
+L.control.layers(BASES,{'Орбиты':orbits,'Планеты':bodies},{collapsed:true}).addTo(map);
+map.fitBounds([[LAT-0.045,LON-0.02],[LAT+0.045,LON+mLon(P[8].dm)+0.02]]);
+
+function panel(i,noFly){
+  const p=P[i];selI=i;
+  if(!noFly){ i? map.flyTo(p.ll,19,{duration:1.2}) : map.flyTo([LAT,LON],20,{duration:1.2}); }
+  document.getElementById('panel').innerHTML=
+  '<h2><span class="dot" style="background:'+p.c+'"></span>'+p.n+'</h2>'+
+  '<div class="chips">'+P.map((q,j)=>'<button data-i="'+j+'">'+q.n+'</button>').join('')+'</div>'+
+  '<table><tr><td>Диаметр (модель)</td><td><b>'+fmt(p.d*K)+'</b></td></tr>'+
+  '<tr><td>Диаметр (реальный)</td><td>'+p.d.toLocaleString('ru')+' км</td></tr>'+
+  (i?'<tr><td>От Солнца (модель)</td><td><b>'+fmt(p.dm)+'</b></td></tr>':'<tr><td>Координаты</td><td>42°49′45.7″N 74°37′50.0″E</td></tr>')+
+  p.st.map(s=>'<tr><td>'+s[0]+'</td><td>'+s[1]+'</td></tr>').join('')+'</table>'+
+  '<b>Факты</b><ul>'+p.f.map(f=>'<li>'+f+'</li>').join('')+'</ul>'+
+  '<p class="note">Цветные круги на карте — истинный размер в метрах; яркие точки с подписями добавлены, чтобы маленькие планеты были заметны. Пунктир — орбиты. Планеты движутся по орбитам против часовой стрелки с реальным соотношением периодов; скорость регулируется ползунком.</p>';
+}
+document.getElementById('panel').addEventListener('click',e=>{const b=e.target.closest('button');if(b)panel(+b.dataset.i);});
+
+// ---- Движение по орбитам (периоды в земных годах, направление против часовой стрелки) ----
+const PER=[0,0.2408,0.6152,1,1.8808,11.862,29.457,84.02,164.79];
+let playing=true,spy=30,tYears=0,lastT=performance.now();
+const spd=v=>Math.pow(10,3-v/100*4);
+function setSpeed(){spy=spd(+sp.value);spv.textContent=(spy<1?spy.toFixed(2):spy<10?spy.toFixed(1):Math.round(spy))+' с';}
+sp.oninput=setSpeed;setSpeed();
+pp.onclick=()=>{playing=!playing;pp.textContent=playing?'⏸ Пауза':'▶ Пуск';};
+function tick(now){
+  const dt=Math.min((now-lastT)/1000,0.2);lastT=now;
+  if(MAPR()){
+    if(playing){
+      tYears+=dt/spy;
+      for(let i=1;i<P.length;i++){
+        const th=2*Math.PI*tYears/PER[i],dm=P[i].dm;
+        setPos(i,LAT+dm*Math.sin(th)/111320,LON+mLon(dm*Math.cos(th)));
+      }
+      yr.textContent='прошло: '+(tYears<1?Math.round(tYears*365)+' сут':tYears.toLocaleString('ru',{maximumFractionDigits:1})+' лет');
+    }
+    if(fol.checked)follow(selI);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+panel(0,true);
+</script>
+</body>
+</html>

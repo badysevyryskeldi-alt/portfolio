@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dordoy Navigator — прототип</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>#lmap{height:540px;border-radius:20px;border:1px solid var(--line);box-shadow:var(--sh);z-index:0}.pic{position:relative;overflow:hidden}.pic>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.big .pic{height:100%;min-height:280px}.arw{font-size:22px;color:#1746c9;text-align:center;line-height:22px}
+:root{--bg:#f4f7fc;--card:#fff;--ink:#0f1c3a;--mut:#5b6784;--pri:#1746c9;--pri2:#0e2f8f;--sky:#38b6ff;--line:#e0e7f3;--sh:0 6px 24px rgba(23,70,201,.09);--zone:#e8f1ff;--warn:#fff4d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1226;--card:#121c38;--ink:#e8eefc;--mut:#9aa8cc;--pri:#5b8cff;--pri2:#9bb7ff;--line:#22305a;--sh:0 6px 24px rgba(0,0,0,.4);--zone:#16264f;--warn:#3a3114}}
+:root[data-theme="dark"]{--bg:#0b1226;--card:#121c38;--ink:#e8eefc;--mut:#9aa8cc;--pri:#5b8cff;--pri2:#9bb7ff;--line:#22305a;--sh:0 6px 24px rgba(0,0,0,.4);--zone:#16264f;--warn:#3a3114}
+*{box-sizing:border-box}html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;line-height:1.5}
+a{color:inherit}button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1180px;margin:auto;display:flex;align-items:center;gap:16px;padding:12px 18px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:19px;text-decoration:none;color:var(--pri);display:flex;gap:8px;align-items:center}
+.logo i{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--pri),var(--sky));display:inline-block}
+nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+nav a{text-decoration:none;padding:7px 12px;border-radius:10px;color:var(--mut);font-weight:600;font-size:14px}
+nav a.on,nav a:hover{background:var(--zone);color:var(--pri)}
+.btn{border:0;border-radius:12px;padding:10px 18px;font-weight:700;cursor:pointer;background:var(--pri);color:#fff;text-decoration:none;display:inline-block;transition:transform .15s,background .15s}
+.btn:hover{background:var(--pri2)}.btn:active{transform:scale(.97)}
+.btn.o{background:transparent;color:var(--pri);border:1.5px solid var(--pri)}
+.btn.s{padding:7px 12px;font-size:13px}.btn[disabled]{opacity:.5;cursor:not-allowed}
+main{max-width:1180px;margin:auto;padding:20px 18px 60px}
+.demo{background:var(--warn);border-radius:12px;padding:9px 14px;font-size:13px;margin-bottom:16px}
+.hero{background:linear-gradient(135deg,#0e2f8f,#1746c9 60%,#38b6ff);color:#fff;border-radius:28px;padding:56px 32px;box-shadow:var(--sh)}
+.hero h1{font-size:clamp(30px,5vw,54px);line-height:1.05;margin:0 0 14px;font-weight:800;max-width:14ch}
+.hero p{max-width:52ch;opacity:.92;margin:0 0 24px}
+.sb{display:flex;gap:8px;background:#fff;border-radius:16px;padding:6px;max-width:640px;position:relative}
+.sb input{flex:1;border:0;background:transparent;color:#0f1c3a;padding:12px 14px;min-width:0;font-size:16px}
+.sug{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:var(--card);color:var(--ink);border-radius:14px;box-shadow:var(--sh);overflow:hidden;z-index:5}
+.sug button{display:block;width:100%;text-align:left;background:none;border:0;padding:10px 16px;cursor:pointer}
+.sug button:hover{background:var(--zone)}
+h2{font-size:24px;margin:34px 0 14px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.card{background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden;border:1px solid var(--line)}
+.cat{padding:20px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px;font-weight:700;border:1px solid var(--line)}
+.cat span{font-size:30px}.cat small{color:var(--mut);font-weight:400}
+.cat:hover{border-color:var(--sky)}
+.pic{height:140px;display:grid;place-items:center;font-size:52px}
+.pb{padding:14px;display:flex;flex-direction:column;gap:5px}
+.pb h3{margin:0;font-size:16px}.pr{font-weight:800;font-size:18px;color:var(--pri)}
+.mut{color:var(--mut);font-size:13px}
+.badge{display:inline-block;background:var(--warn);font-size:11px;padding:2px 8px;border-radius:99px;font-weight:700}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.lay{display:grid;grid-template-columns:250px 1fr;gap:20px}
+@media(max-width:800px){.lay{grid-template-columns:1fr}.hero{padding:36px 20px}}
+.flt{padding:16px;display:flex;flex-direction:column;gap:12px;align-self:start}
+label{font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:4px}
+input,select,textarea{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mapw{display:grid;grid-template-columns:1fr 300px;gap:16px}
+@media(max-width:800px){.mapw{grid-template-columns:1fr}}
+svg.map{width:100%;height:auto;background:var(--card);border-radius:20px;border:1px solid var(--line);box-shadow:var(--sh);touch-action:none}
+.mk{cursor:pointer}.mk:hover circle{r:11}
+.flow{stroke-dasharray:10 8;animation:fl 1s linear infinite}
+@keyframes fl{to{stroke-dashoffset:-18}}
+@media(prefers-reduced-motion:reduce){.flow{animation:none}}
+.form{max-width:640px;display:flex;flex-direction:column;gap:12px;padding:22px}
+.tbl{width:100%;border-collapse:collapse}.tbl td,.tbl th{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:99px;cursor:pointer;font-weight:600}
+.tabs button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:12px;z-index:50}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header><div class="bar">
+<a class="logo" href="#/"><i></i>Dordoy Navigator</a>
+<nav id="nav"></nav>
+<a class="btn o s" href="#/login">Войти</a><a class="btn s" href="#/sell">Регистрация</a>
+</div></header>
+<main id="app"></main>
+<footer>Прототип. Товары добавляют продавцы, а магазины и расположение демонстрационные.</footer>
+<script>
+const CATS=[["Мужская одежда","👔"],["Женская одежда","👗"],["Детская одежда","🧸"],["Обувь","👟"],["Спортивная одежда","🏃"],["Сумки и аксессуары","👜"],["Электроника","🎧"],["Товары для дома","🏠"],["Ткани и материалы","🧵"],["Другие товары","📦"]];
+const HUE=[215,330,45,25,160,280,195,100,10,240];
+// магазины: название, x, y (схематичные координаты на демо-схеме)
+let STORES=[["Демо-магазин «Север»",110,90],["Демо-магазин «Восток»",480,100],["Демо-бутик «Лето»",120,210],["Демо-бутик «Мода»",470,215],["Демо-опт «Текстиль»",230,110],["Демо-точка «Электро»",370,120],["Демо-обувь «Шаг»",230,230],["Демо-дом «Уют»",360,235]].map((s,i)=>({id:i,name:s[0],x:s[1],y:s[2],ok:true,pend:false,desc:"Демонстрационный магазин. Расположение примерное.",loc:"Демо-расположение, номер контейнера не указан"}));
+// товары: название, кат, цена (сом), магазин, размер, цвет, режим, страна, новизна
+let PRODS=[];
+let mapProv="osm",toast="",myStore=0,nid=1000,mapView=null,LM=null,applied="",pimg=null, state={q:"",cat:"",min:"",max:"",size:"",color:"",mode:"",country:"",sort:"new"};
+try{const d=JSON.parse(localStorage.getItem("dn1")||"null");if(d){STORES=d.S;PRODS=d.P;nid=d.n;myStore=d.m}}catch(e){}
+const save=()=>{try{localStorage.setItem("dn1",JSON.stringify({S:STORES,P:PRODS,n:nid,m:myStore}))}catch(e){}};
+let sel=null, route=null, adminTab="apps", user=null, mapQ="";
+const $=s=>document.querySelector(s), app=$("#app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ok=()=>STORES.filter(s=>s.ok);
+const sName=id=>STORES.find(s=>s.id===id).name;
+function say(t){toast=t;draw();setTimeout(()=>{toast="";draw()},2200)}
+function pic(p){if(p.img)return `<div class="pic" style="padding:0"><img src="${p.img}" alt="${esc(p.name)}"></div>`;return `<div class="pic" style="background:hsl(${HUE[p.cat]},70%,${matchMedia("(prefers-color-scheme:dark)").matches?"22%":"92%"})" role="img" aria-label="${esc(p.name)}">${CATS[p.cat][1]}</div>`}
+function card(p){return `<article class="card">${pic(p)}<div class="pb"><span class="mut">${CATS[p.cat][0]}</span>${STORES[p.store].pend?`<span class="badge">На проверке · видно только вам</span>`:""}<h3>${esc(p.name)}</h3><span class="pr">${p.price} сом</span><span class="mut">${esc(sName(p.store))}<br>Расположение примерное</span><div class="row"><a class="btn s" href="#/product/${p.id}">Подробнее</a><a class="btn o s" href="#/map/${p.store}">Найти на карте</a></div></div></article>`}
+function match(p){const s=state,q=s.q.trim().toLowerCase();
+ if(!vis(p.store))return false;
+ const hay=[p.name,CATS[p.cat][0],sName(p.store),p.color,p.country,p.mode].join(" ").toLowerCase();
+ if(q&&!q.split(/\s+/).every(w=>hay.includes(w)))return false;
+ if(s.cat!==""&&p.cat!==+s.cat)return false;
+ if(s.min!==""&&p.price<+s.min)return false;if(s.max!==""&&p.price>+s.max)return false;
+ if(s.size&&p.size!==s.size)return false;if(s.color&&p.color!==s.color)return false;
+ if(s.mode&&p.mode!==s.mode)return false;if(s.country&&p.country!==s.country)return false;return true}
+function results(){const r=PRODS.filter(match);
+ r.sort((a,b)=>state.sort==="asc"?a.price-b.price:state.sort==="desc"?b.price-a.price:b.nw-a.nw);return r}
+const loadHeic=()=>window.heic2any?Promise.resolve():new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+const vis=id=>STORES[id]&&(STORES[id].ok||(user==="seller"&&id===myStore));
+const pend=()=>STORES.filter(s=>s.pend);
+const uniq=k=>[...new Set(PRODS.map(p=>p[k]))].sort();
+const opts=(arr,v)=>`<option value="">Любой</option>`+arr.map(x=>`<option ${x==v?"selected":""}>${x}</option>`).join("");
+
+function viewHome(){
+ return `<div class="hero"><h1>Найди всё, что нужно, на Дордое</h1><p>Тысячи товаров, магазинов и продавцов в одном месте. Найди товар и узнай, как до него добраться.</p>
+ <div class="sb"><input id="hq" placeholder="Например: кроссовки, ткань, куртка" autocomplete="off" aria-label="Поиск"><button class="btn" id="hgo">Найти</button><div class="sug" id="sug" hidden></div></div></div>
+ <h2>Популярные категории</h2><div class="grid">${CATS.slice(0,6).map((c,i)=>`<button class="card cat" data-cat="${i}"><span>${c[1]}</span>${c[0]}<small>${PRODS.filter(p=>p.cat===i&&ok().some(s=>s.id===p.store)).length} товаров</small></button>`).join("")}</div>
+ <h2>Новые товары</h2><div class="grid">${PRODS.filter(p=>vis(p.store)).sort((a,b)=>b.nw-a.nw).slice(0,8).map(card).join("")||'<p class="mut">Пока нет товаров. Продавцы добавляют их в разделе «Для продавцов».</p>'}</div>`}
+function viewCatalog(){return `<h2 style="margin-top:0">Каталог</h2><div class="grid">${CATS.map((c,i)=>`<button class="card cat" data-cat="${i}"><span>${c[1]}</span>${c[0]}<small>${PRODS.filter(p=>p.cat===i&&ok().some(s=>s.id===p.store)).length} товаров</small></button>`).join("")}</div>`}
+function viewSearch(){const r=results();return `<div class="lay"><aside class="card flt"><b>Фильтры</b>
+ <label>Поиск<input id="fq" value="${esc(state.q)}" placeholder="название, магазин…"></label>
+ <label>Категория<select id="fcat"><option value="">Все</option>${CATS.map((c,i)=>`<option value="${i}" ${state.cat!==""&&+state.cat===i?"selected":""}>${c[0]}</option>`).join("")}</select></label>
+ <div class="two"><label>Цена от<input id="fmin" type="number" min="0" value="${state.min}"></label><label>до<input id="fmax" type="number" min="0" value="${state.max}"></label></div>
+ <label>Размер<select id="fsize">${opts(uniq(4),state.size)}</select></label>
+ <label>Цвет<select id="fcolor">${opts(uniq(5),state.color)}</select></label>
+ <label>Опт / розница<select id="fmode">${opts(["опт","розница"],state.mode)}</select></label>
+ <label>Страна<select id="fcountry">${opts(uniq(7),state.country)}</select></label>
+ <button class="btn o s" id="reset">Сбросить</button></aside>
+ <section><div class="row" style="justify-content:space-between;align-items:center;margin:0 0 14px"><b>Найдено: ${r.length}</b>
+ <label style="flex-direction:row;align-items:center">Сортировка <select id="fsort" style="width:auto"><option value="new" ${state.sort==="new"?"selected":""}>Сначала новые</option><option value="asc" ${state.sort==="asc"?"selected":""}>Сначала дешёвые</option><option value="desc" ${state.sort==="desc"?"selected":""}>Сначала дорогие</option></select></label></div>
+ ${r.length?`<div class="grid">${r.map(card).join("")}</div>`:`<div class="card" style="padding:30px">Ничего не найдено. Измените запрос или нажмите «Сбросить».</div>`}</section></div>`}
+function viewProduct(id){const p=PRODS.find(x=>x.id===id);if(!p)return "Товар не найден";const s=STORES[p.store];
+ return `<div class="card big" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${pic(p).replace('height:140px','height:100%;min-height:260px')}<div class="pb" style="padding:26px"><span class="badge">Демо-данные</span><h1 style="margin:6px 0">${esc(p.name)}</h1><span class="pr" style="font-size:28px">${p.price} сом</span>
+ <p class="mut">Категория: ${CATS[p.cat][0]}<br>Размер: ${p.size} · Цвет: ${p.color}<br>Продажа: ${p.mode} · Страна: ${p.country}</p>
+ <p>Магазин: <a href="#/store/${s.id}">${esc(s.name)}</a><br><span class="mut">Контейнер / место: ${esc(s.loc)}<br>Точка на карте примерная</span></p>
+ <div class="row"><a class="btn" href="#/map/${s.id}/route">Показать контейнер на карте</a><a class="btn o" href="#/store/${s.id}">Страница магазина</a></div></div></div>`}
+function viewStores(){return `<h2 style="margin-top:0">Магазины</h2><div class="grid">${ok().map(s=>`<a class="card pb" style="text-decoration:none" href="#/store/${s.id}"><span class="badge">Демо</span><h3>${esc(s.name)}</h3><span class="mut">${PRODS.filter(p=>p.store===s.id).length} товаров</span></a>`).join("")}</div>`}
+function viewStore(id){const s=STORES[id];if(!s||!vis(id))return "Магазин не найден";
+ return `<div class="card pb" style="padding:24px"><span class="badge">Демо-магазин · примерное расположение</span><h1 style="margin:6px 0">${esc(s.name)}</h1><p>${esc(s.desc)}</p><p class="mut">Контакты скрыты: продавец не разрешил показывать WhatsApp и Instagram.</p><div class="row"><a class="btn" href="#/map/${s.id}">Показать на карте</a></div></div>
+ <h2>Товары магазина</h2><div class="grid">${PRODS.filter(p=>p.store===id).map(card).join("")||"<p>Пока нет товаров.</p>"}</div>`}
+
+// карта
+const ZONES=[["Демонстрационная зона 1",40,50,250,110],["Демонстрационная зона 2",310,50,250,110],["Демонстрационная зона 3",40,180,250,100],["Демонстрационная зона 4",310,180,250,100]];
+function path(s){const gx=300,gy=360;return `${gx},${gy} ${gx},${s.y<160?150:170} ${s.x},${s.y<160?150:170} ${s.x},${s.y+12}`.replace(/(\d+),(\d+)/g,"$1,$2")}
+function viewMap(){const q=mapQ.toLowerCase();const list=STORES.filter(s=>vis(s.id)).filter(s=>!q||s.name.toLowerCase().includes(q)||PRODS.some(p=>p.store===s.id&&p.name.toLowerCase().includes(q)));const S=sel!=null?STORES[sel]:null;
+ return `<div class="demo">Карта Google. Центр рынка взят из Википедии (примерно). Зоны и точки демонстрационных магазинов условные: номера контейнеров не проверены.</div>
+ <div class="mapw"><div>${mapBox(S)}<div class="row"><button class="btn o s" id="zr">Весь рынок</button></div></div>
+ <aside class="card pb" style="padding:16px"><label>Магазин или товар<input id="mq" value="${esc(mapQ)}" placeholder="Поиск по карте"></label>
+ <div style="max-height:150px;overflow:auto">${list.map(s=>`<button class="btn o s" style="margin:2px;width:100%;text-align:left" data-pick="${s.id}">${esc(s.name)}</button>`).join("")||"<span class=mut>Ничего не найдено</span>"}</div>
+ ${S?`<hr style="width:100%;border:0;border-top:1px solid var(--line)"><b>${esc(S.name)}</b><span class="badge">${S.lat!=null?"Указано продавцом":"Примерное расположение"}</span><span class="mut">Место: ${esc(S.loc)}</span><span class="mut">${PRODS.filter(p=>p.store===S.id).length} товаров</span><div class="row"><button class="btn s" id="rt">Построить маршрут</button><a class="btn o s" href="#/store/${S.id}">Страница</a></div>${route?`<span class="mut">Демо-маршрут: от входа по главному проходу.</span>`:""}`:`<span class="mut">Выберите точку на схеме или в списке.</span>`}</aside></div>`}
+const C=[42.93333,74.62083],ll=(x,y)=>[C[0]+(200-y)*0.00002,C[1]+(x-300)*0.00003];
+const GKEY=()=>window.GMAPS_KEY||localStorage.getItem("gkey")||"";
+let gP=null;
+function loadG(){const k=GKEY();if(!k)return Promise.reject();if(window.google&&window.google.maps)return Promise.resolve();
+ return gP||(gP=new Promise((res,rej)=>{window.__gok=res;window.gm_authFailure=()=>{document.querySelectorAll(".gerr").forEach(e=>e.hidden=false)};const s=document.createElement("script");s.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(k)+"&language=ru&callback=__gok";s.onerror=()=>{gP=null;rej()};document.head.appendChild(s)}))}
+const keyBox=()=>`<div class="demo">Чтобы карта Google показывала точки, зоны и маршрут, нужен ключ Google Maps JavaScript API (Google требует привязать платёжную карту, есть бесплатный лимит). <a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener">Получить ключ</a>.<div class="row"><input id="gk" placeholder="Вставьте ключ" style="max-width:320px"><button class="btn s" id="gks">Сохранить ключ</button></div><div class="gerr" hidden style="color:#c0392b">Google отклонил ключ: проверьте, что включён Maps JavaScript API и нет запрещающих ограничений.</div></div>`;
+function bindKey(){const b=$("#gks");if(b)b.onclick=()=>{const v=$("#gk").value.trim();if(!v)return;localStorage.setItem("gkey",v);gP=null;draw()}}
+const pos=s=>s.lat!=null?[s.lat,s.lng]:ll(s.x,s.y);
+function routePts(S){if(S.lat==null)return path(S).split(" ").map(p=>{const c=p.split(",").map(Number);return ll(c[0],c[1])});const P=pos(S),a=ll(300,360),b=ll(300,165);return [a,b,[b[0],P[1]],P]}
+let PM=null,pickPos=null,pickKey="";
+const mapList=()=>{const q=mapQ.toLowerCase();return STORES.filter(s=>vis(s.id)).filter(s=>!q||s.name.toLowerCase().includes(q)||PRODS.some(p=>p.store===s.id&&p.name.toLowerCase().includes(q)))};
+function mapBox(S){const P=S?pos(S):C,la=P[0].toFixed(6),lo=P[1].toFixed(6);
+ const body=GKEY()?'<div id="lmap"></div>':`${keyBox()}<iframe title="Google Maps" style="width:100%;height:480px;border:0;border-radius:20px" loading="lazy" src="https://maps.google.com/maps?q=${la},${lo}&z=${S?17:15}&output=embed&hl=ru"></iframe>`;
+ return `${body}<div class="row"><a class="btn o s" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${la},${lo}">Маршрут в Google Maps</a><a class="btn o s" target="_blank" rel="noopener" href="https://2gis.kg/bishkek?m=${lo},${la}/17">Открыть в 2ГИС</a></div><div class="mut" style="margin-top:6px">${S&&S.lat!=null?"Точка указана продавцом на карте.":"Точка магазина демонстрационная и примерная: настоящие координаты контейнеров пока не добавлены."}</div>`}
+function pickerBox(){const k=GKEY();const tail='<span class="mut" id="pkt">Точка не выбрана</span></div></div>';
+ if(k)return `<div><b>Точка на карте Google</b><div class="mut">Нажмите на карту там, где находится ваш контейнер, или перетащите маркер.</div><div id="pk" style="height:300px;border-radius:16px;border:1px solid var(--line);margin:6px 0"></div><div class="row" style="align-items:center"><button class="btn o s" type="button" id="pkgeo">Моё местоположение</button>${tail}`;
+ return `<div><b>Точка на карте Google</b><div class="mut">Откройте <a href="https://www.google.com/maps/@42.93333,74.62083,17z" target="_blank" rel="noopener">Google Maps</a>, нажмите правой кнопкой мыши (на телефоне — долгое нажатие) на свой контейнер, скопируйте координаты из меню и вставьте сюда. Интерактивный выбор по клику включится после добавления ключа Google Maps API на странице «Карта».</div><div class="row" style="align-items:center;margin-top:6px"><input id="pki" placeholder="42.93333, 74.62083" style="max-width:240px"><button class="btn o s" type="button" id="pkgeo">Моё местоположение</button>${tail}`}
+function initPicker(){const g=$("#pkgeo");if(!g)return;const inp=$("#pki"),el=$("#pk");
+ const upd=()=>{const t=$("#pkt");if(t)t.textContent=pickPos?`Выбрано: ${pickPos[0].toFixed(5)}, ${pickPos[1].toFixed(5)}`:"Точка не выбрана";if(inp&&pickPos&&document.activeElement!==inp)inp.value=pickPos.map(x=>x.toFixed(6)).join(", ")};
+ let put=p=>{pickPos=p;upd()};
+ if(inp){inp.oninput=()=>{const m=inp.value.match(/(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)/);pickPos=m?[+m[1],+m[2]]:null;upd()}}
+ g.onclick=()=>{if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(q=>put([q.coords.latitude,q.coords.longitude],true),()=>{$("#pkt").textContent="Не удалось определить местоположение"})};
+ upd();
+ if(el)loadG().then(()=>{if(!el.isConnected)return;const gm=google.maps;PM=new gm.Map(el,{center:{lat:(pickPos||C)[0],lng:(pickPos||C)[1]},zoom:pickPos?17:15,mapTypeControl:false,streetViewControl:false});let mk=null;
+  const set=(lat,lng,fly)=>{pickPos=[lat,lng];if(mk)mk.setPosition({lat,lng});else{mk=new gm.Marker({position:{lat,lng},map:PM,draggable:true});mk.addListener("dragend",()=>{const q=mk.getPosition();pickPos=[q.lat(),q.lng()];upd()})}if(fly){PM.setCenter({lat,lng});PM.setZoom(18)}upd()};
+  put=(p,fly)=>set(p[0],p[1],fly);if(pickPos)set(pickPos[0],pickPos[1]);PM.addListener("click",e=>set(e.latLng.lat(),e.latLng.lng()))}).catch(()=>{el.innerHTML=keyBox();bindKey()})}
+function initMap(){const el=$("#lmap");if(!el)return;
+ loadG().then(()=>{if(!el.isConnected)return;const gm=google.maps,G=p=>({lat:p[0],lng:p[1]});
+  LM=new gm.Map(el,{center:G(mapView?mapView.c:C),zoom:mapView?mapView.z:15,mapTypeControl:false,streetViewControl:false});
+  ZONES.forEach(z=>{const a=ll(z[1],z[2]),b=ll(z[1]+z[3],z[2]+z[4]);new gm.Rectangle({map:LM,bounds:{north:a[0],south:b[0],west:a[1],east:b[1]},strokeColor:"#1746c9",strokeWeight:1,fillColor:"#1746c9",fillOpacity:.12,clickable:false});
+   new gm.Marker({map:LM,position:G(a),clickable:false,icon:{path:gm.SymbolPath.CIRCLE,scale:0},label:{text:z[0],fontSize:"11px",color:"#1746c9"}})});
+  mapList().forEach(s=>{const m=new gm.Marker({map:LM,position:G(pos(s)),title:s.name+(s.lat!=null?"":" (демо)"),icon:{path:gm.SymbolPath.CIRCLE,scale:s.id===sel?10:7,fillColor:s.id===sel?"#38b6ff":"#1746c9",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});m.addListener("click",()=>{sel=s.id;route=false;draw()})});
+  if(sel!=null){const S=STORES[sel];
+   if(route){const pts=routePts(S).map(G);new gm.Polyline({map:LM,path:pts,strokeColor:"#1746c9",strokeWeight:5,icons:[{icon:{path:gm.SymbolPath.FORWARD_CLOSED_ARROW,scale:3,strokeColor:"#1746c9",fillColor:"#1746c9",fillOpacity:1},offset:"0",repeat:"70px"}]});
+    new gm.Marker({map:LM,position:pts[0],label:{text:"Вход (условный)",fontSize:"11px"}});const bd=new gm.LatLngBounds();pts.forEach(p=>bd.extend(p));LM.fitBounds(bd,50)}
+   else{LM.setCenter(G(pos(S)));LM.setZoom(Math.max(LM.getZoom(),16))}}
+  LM.addListener("idle",()=>{const c=LM.getCenter();mapView={c:[c.lat(),c.lng()],z:LM.getZoom()}})}).catch(()=>{el.innerHTML=keyBox();bindKey()})}
+
+// продавцы
+function viewSell(){return `<div class="card form" id="sf"><h2 style="margin:0">Стать продавцом</h2><span class="demo">Демо: данные не отправляются на сервер и пароль не сохраняется. Заявка попадает в админ-панель этой страницы со статусом Pending.</span>
+ <div class="two"><label>Имя и фамилия<input id="sn" required></label><label>Телефон<input id="sp" placeholder="+996 ..." inputmode="tel"></label></div>
+ <div class="two"><label>Пароль (мин. 6)<input id="spw" type="password"></label><label>Email (необязательно)<input id="se" type="email"></label></div>
+ <label>Название магазина<input id="st"></label><label>Описание<textarea id="sd" rows="2"></textarea></label>
+ <label>Район / ряд / проход / контейнер<input id="sl" placeholder="например: зона, проход, номер"></label>${pickerBox()}
+ <b>Первый товар</b><div class="two"><label>Название<input id="pn"></label><label>Цена, сом<input id="pp" type="number" min="1"></label></div>
+ <label>Категория<select id="pc">${CATS.map((c,i)=>`<option value="${i}">${c[0]}</option>`).join("")}</select></label>
+ <label style="flex-direction:row;gap:8px;align-items:center"><input type="checkbox" id="sw" style="width:auto"> Разрешаю показывать WhatsApp в каталоге</label>
+ <button class="btn" id="send">Отправить заявку</button></div>`}
+function viewLogin(){return `<div class="card form"><h2 style="margin:0">Вход</h2><span class="demo">Демо-вход без настоящей проверки пароля.</span><label>Телефон<input id="lp"></label><label>Пароль<input id="lw" type="password"></label>
+ <div class="row"><button class="btn" data-login="seller">Войти как продавец</button><button class="btn o" data-login="admin">Войти как админ</button></div></div>`}
+function viewDash(){if(user!=="seller")return "<div class='demo'>Войдите как продавец.</div>";const m=STORES[myStore];
+ return `<h2 style="margin-top:0">Личный кабинет продавца</h2><div class="demo">Магазин: ${esc(m.name)} · Статус проверки: ${m.pend?"на проверке (Pending), покупатели пока не видят магазин":m.ok?"одобрен":"не одобрен"}</div>
+ <div class="card form" style="max-width:none"><b>Магазин</b><label>Описание<textarea id="dd" rows="2">${esc(m.desc)}</textarea></label><label>Расположение (ряд, проход, контейнер)<input id="dl" value="${esc(m.loc)}"></label>${pickerBox()}<button class="btn s" id="sd2">Сохранить</button></div>
+ <h2>Добавить товар</h2><div class="card form" style="max-width:none"><div class="two"><label>Название<input id="an"></label><label>Цена, сом<input id="ap" type="number" min="1"></label></div>
+ <div class="two"><label>Категория<select id="ac">${CATS.map((c,i)=>`<option value="${i}">${c[0]}</option>`).join("")}</select></label><label>Страна производства<input id="ak"></label></div>
+ <div class="two"><label>Размер<input id="az"></label><label>Цвет<input id="al"></label></div>
+ <label>Продажа<select id="am"><option>розница</option><option>опт</option></select></label>
+ <label>Фото товара (любой формат: JPG, PNG, WebP, HEIC, GIF, BMP, SVG…)<input id="af" type="file" accept="image/*,.heic,.heif,.avif"></label><div id="apv" class="mut"></div><button class="btn" id="aadd">Добавить товар</button></div>
+ <h2>Мои товары</h2><div class="card" style="overflow:auto"><table class="tbl"><tr><th>Товар</th><th>Цена</th><th></th></tr>${PRODS.filter(p=>p.store===myStore).map(p=>`<tr><td>${p.img?`<img src="${p.img}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:8px">`:""}${esc(p.name)}</td><td><input type="number" value="${p.price}" data-price="${p.id}" style="width:90px"></td><td><button class="btn o s" data-del="${p.id}">Удалить</button></td></tr>`).join("")||"<tr><td colspan=3>Товаров пока нет.</td></tr>"}</table></div>`}
+function viewAdmin(){if(user!=="admin")return "<div class='demo'>Доступ только для администратора. Войдите как админ.</div>";
+ return `<h2 style="margin-top:0">Админ-панель</h2><div class="grid" style="margin-bottom:14px"><div class="card pb"><span class="mut">Магазинов</span><b class="pr">${ok().length}</b></div><div class="card pb"><span class="mut">Товаров</span><b class="pr">${PRODS.length}</b></div><div class="card pb"><span class="mut">Заявок на проверке</span><b class="pr">${pend().length}</b></div></div>
+ <div class="tabs"><button class="${adminTab==="apps"?"on":""}" data-tab="apps">Заявки</button><button class="${adminTab==="stores"?"on":""}" data-tab="stores">Магазины</button></div>
+ <div class="card" style="overflow:auto">${adminTab==="apps"?`<table class="tbl"><tr><th>Магазин</th><th>Продавец</th><th>Статус</th><th></th></tr>${pend().map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(a.owner)}</td><td><span class="badge">Pending</span></td><td><button class="btn s" data-ap="${a.id}">Одобрить</button> <button class="btn o s" data-rj="${a.id}">Отклонить</button></td></tr>`).join("")||"<tr><td colspan=4>Новых заявок нет. Отправьте заявку через «Для продавцов».</td></tr>"}</table>`:
+ `<table class="tbl"><tr><th>Магазин</th><th>Статус</th><th></th></tr>${STORES.map(s=>`<tr><td>${esc(s.name)}</td><td>${s.pend?"Pending":s.ok?"Активен":"Заблокирован"}</td><td><button class="btn o s" data-bl="${s.id}">${s.ok?"Заблокировать":"Разблокировать"}</button></td></tr>`).join("")}</table>`}</div>`}
+
+function parse(){const h=cur.slice(2).split("/");return [h[0]||"home",h[1],h[2]]}
+function draw(){save();const [r,a,b2]=parse();LM=null;PM=null;if(r!=="sell"&&r!=="dash")pickKey="";if(r!=="map")applied="";
+ $("#nav").innerHTML=[["","Главная","home"],["catalog","Каталог","catalog"],["map","Карта","map"],["stores","Магазины","stores"],["sell","Для продавцов","sell"]].map(n=>`<a href="#/${n[0]}" class="${r===n[2]||(r==="search"&&n[2]==="catalog")?"on":""}">${n[1]}</a>`).join("")+(user==="seller"?`<a href="#/dash" class="${r==="dash"?"on":""}">Кабинет</a>`:"")+(user==="admin"?`<a href="#/admin" class="${r==="admin"?"on":""}">Админ</a>`:"");
+ let h="";
+ if(r==="home")h=viewHome();else if(r==="catalog")h=viewCatalog();else if(r==="search")h=viewSearch();else if(r==="product")h=viewProduct(+a);
+ else if(r==="stores")h=viewStores();else if(r==="store")h=viewStore(+a);else if(r==="map"){if(a!==undefined&&applied!==cur){applied=cur;sel=+a;route=b2==="route";mapView=null}h=viewMap()}
+ else if(r==="sell")h=viewSell();else if(r==="login")h=viewLogin();else if(r==="dash")h=viewDash();else if(r==="admin")h=viewAdmin();else h=viewHome();
+ const keep=document.activeElement&&document.activeElement.id,pos=document.activeElement&&document.activeElement.selectionStart;
+ app.innerHTML=h+(toast?`<div class="toast" role="status">${toast}</div>`:"");
+ if(keep){const e=document.getElementById(keep);if(e){e.focus();try{e.setSelectionRange(pos,pos)}catch(_){}}}
+ bind(r)}
+let cur=location.hash||"#/";
+const go=h=>{cur=h;try{history.replaceState(null,"",h)}catch(e){}window.scrollTo(0,0);draw()};
+document.addEventListener("click",e=>{const a=e.target.closest('a[href^="#/"]');if(a){e.preventDefault();go(a.getAttribute("href"))}});
+function bind(r){
+ if(r==="sell"||r==="dash"){const key=r==="sell"?"reg":"d"+myStore;if(pickKey!==key){pickKey=key;const m=STORES[myStore];pickPos=(r==="dash"&&m&&m.lat!=null)?[m.lat,m.lng]:null}initPicker()}
+ app.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{state={...state,q:"",cat:b.dataset.cat};go("#/search")});
+ const hq=$("#hq");if(hq){const sug=$("#sug");const names=[...new Set(PRODS.map(p=>p.name).concat(CATS.map(c=>c[0])))];
+  hq.oninput=()=>{const v=hq.value.toLowerCase();const m=v?names.filter(n=>n.toLowerCase().includes(v)).slice(0,5):[];sug.hidden=!m.length;sug.innerHTML=m.map(n=>`<button>${esc(n)}</button>`).join("");sug.querySelectorAll("button").forEach(b=>b.onclick=()=>{state={...state,q:b.textContent,cat:""};go("#/search")})};
+  const run=()=>{state={...state,q:hq.value,cat:""};go("#/search")};$("#hgo").onclick=run;hq.onkeydown=e=>{if(e.key==="Enter")run()}}
+ if(r==="search"){const m={fq:"q",fcat:"cat",fmin:"min",fmax:"max",fsize:"size",fcolor:"color",fmode:"mode",fcountry:"country",fsort:"sort"};
+  Object.entries(m).forEach(([id,k])=>{const e=$("#"+id);e.oninput=e.onchange=()=>{state[k]=e.value;draw()}});
+  $("#reset").onclick=()=>{state={q:"",cat:"",min:"",max:"",size:"",color:"",mode:"",country:"",sort:"new"};draw()}}
+ if(r==="map"){app.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{sel=+b.dataset.pick;route=false;draw()});
+  $("#mq").oninput=e=>{mapQ=e.target.value;draw()};$("#zr").onclick=()=>{sel=null;route=false;mapQ="";mapView=null;draw()};
+  bindKey();const rt=$("#rt");if(rt)rt.onclick=()=>{route=true;draw()};initMap()}
+ const send=$("#send");if(send)send.onclick=()=>{const v=id=>$("#"+id).value.trim();
+  if(!v("sn")||!v("st")||!v("pn")||!(+v("pp")>0))return say("Заполните имя, магазин, товар и цену");
+  if(!/^\+?[0-9 ()-]{9,}$/.test(v("sp")))return say("Проверьте номер телефона");if(v("spw").length<6)return say("Пароль — минимум 6 символов");
+  const id=STORES.length;STORES.push({id,name:v("st"),x:60+Math.random()*480|0,y:70+Math.random()*180|0,ok:false,pend:true,lat:pickPos?pickPos[0]:null,lng:pickPos?pickPos[1]:null,owner:v("sn"),desc:v("sd")||"Описание не указано.",loc:v("sl")||"Не указано"});PRODS.push({id:nid++,name:v("pn"),cat:+$("#pc").value,price:+v("pp"),store:id,size:"—",color:"—",mode:"розница",country:"—",nw:nid});myStore=id;user="seller";say("Заявка отправлена, статус: Pending");go("#/dash")};
+ app.querySelectorAll("[data-login]").forEach(b=>b.onclick=()=>{user=b.dataset.login;go(user==="admin"?"#/admin":"#/dash")});
+ const af=$("#af");if(af){af.onchange=async()=>{pimg=null;let f=af.files[0];const pv=$("#apv");pv.textContent="";if(!f)return;
+  if(f.size>30e6){af.value="";pv.textContent="Файл слишком большой (максимум 30 МБ)";return}
+  const fail=()=>{pimg=null;pv.innerHTML="<b style='color:#c0392b'>Не удалось прочитать этот формат. Попробуйте сохранить фото как JPG или PNG.</b>"};
+  try{if(/hei[cf]/i.test(f.type)||/\.(heic|heif)$/i.test(f.name)){pv.textContent="Конвертирую HEIC…";await loadHeic();const o=await window.heic2any({blob:f,toType:"image/jpeg",quality:.85});f=Array.isArray(o)?o[0]:o}}catch(e){return fail()}
+  const im=new Image();im.onerror=fail;im.onload=()=>{const w=im.naturalWidth||640,h=im.naturalHeight||480,k=Math.min(1,640/w),c=document.createElement("canvas");c.width=Math.max(1,w*k|0);c.height=Math.max(1,h*k|0);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);pimg=c.toDataURL("image/jpeg",.82);pv.innerHTML=`<img src="${pimg}" alt="Предпросмотр" style="max-width:160px;border-radius:12px">`};im.src=URL.createObjectURL(f)};
+  $("#aadd").onclick=()=>{const n=$("#an").value.trim(),pr=+$("#ap").value;if(!n||!(pr>0))return say("Укажите название и цену");if(af.files[0]&&!pimg)return say("Фото ещё обрабатывается, подождите секунду и нажмите снова");
+   PRODS.push({id:nid,name:n,cat:+$("#ac").value,price:pr,store:myStore,size:$("#az").value||"—",color:$("#al").value||"—",mode:$("#am").value,country:$("#ak").value||"—",nw:nid++,img:pimg});pimg=null;state={q:n,cat:"",min:"",max:"",size:"",color:"",mode:"",country:"",sort:"new"};say("Товар добавлен и найден в поиске"+(STORES[myStore].pend?" (покупатели увидят его после одобрения магазина)":""));go("#/search")}}
+ const sd2=$("#sd2");if(sd2)sd2.onclick=()=>{STORES[myStore].desc=$("#dd").value;STORES[myStore].loc=$("#dl").value;if(pickPos){STORES[myStore].lat=pickPos[0];STORES[myStore].lng=pickPos[1]}say("Сохранено")};
+ app.querySelectorAll("[data-price]").forEach(i=>i.onchange=()=>{PRODS.find(p=>p.id===+i.dataset.price).price=+i.value||1;say("Цена изменена")});
+ app.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{const i=PRODS.findIndex(p=>p.id===+b.dataset.del);PRODS.splice(i,1);say("Товар удалён")});
+ app.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{adminTab=b.dataset.tab;draw()});
+ app.querySelectorAll("[data-ap]").forEach(b=>b.onclick=()=>{const s=STORES[+b.dataset.ap];s.pend=false;s.ok=true;say("Магазин одобрен и появился в каталоге")});
+ app.querySelectorAll("[data-rj]").forEach(b=>b.onclick=()=>{const s=STORES[+b.dataset.rj];s.pend=false;s.ok=false;say("Заявка отклонена")});
+ app.querySelectorAll("[data-bl]").forEach(b=>b.onclick=()=>{const s=STORES[+b.dataset.bl];if(s.pend)return say("Сначала одобрите заявку");s.ok=!s.ok;say(s.ok?"Разблокирован":"Заблокирован")})}
+addEventListener("hashchange",()=>{cur=location.hash||"#/";window.scrollTo(0,0);draw()});draw();
+</script>
+</body>
+</html>
